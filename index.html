@@ -173,6 +173,7 @@ html.pm .ptitle b{color:var(--blue)}html.pm .ptitle span{color:var(--mute);font-
 <main id="app"></main>
 <dialog id="newdlg"><h2>เพิ่มนักกีฬา</h2><p class="hint">เลือกคนที่จะคัดลอกข้อมูลมาเป็นต้นแบบ แล้วค่อยแก้ไขทีหลัง<br>คัดลอก: ชื่อ รหัส ตำแหน่ง Section แผนก อายุ ประสบการณ์ Shop ตาราง TM/TL และ MUS/Winner (ไม่คัดลอกรูปและคะแนน)</p><select id="cpsrc"></select><div class="row"><button class="btn ghost" data-a="newcancel">ยกเลิก</button><button class="btn" data-a="newok">เพิ่มนักกีฬา</button></div></dialog>
 <dialog id="pwdlg"><h2 id="pwttl">ใส่รหัสผ่าน</h2><p class="hint" id="pwmsg"></p><input type="password" id="pwin" autocomplete="current-password" placeholder="รหัสผ่าน"><div class="row"><button type="button" class="btn ghost" data-a="pwcancel">ยกเลิก</button><button type="button" class="btn" data-a="pwok">ตกลง</button></div></dialog>
+<dialog id="yrdlg"><h2>เพิ่มปีใหม่</h2><p class="hint">กรอกปี ค.ศ. 4 หลัก เช่น 2027</p><input type="text" id="yrin" inputmode="numeric" maxlength="4" placeholder="2027"><div class="row"><button type="button" class="btn ghost" data-a="yrcancel">ยกเลิก</button><button type="button" class="btn" data-a="yrok">เพิ่มปี</button></div></dialog>
 <script>
 const ST=['ts','aw','pm'];
 const MN=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -264,14 +265,14 @@ function render(){
   const ys=Object.keys(D.years).sort().reverse();
   $('#ysel').innerHTML=ys.map(y=>`<option value="${y}" ${y===ui.y?'selected':''}>ปี ${y}</option>`).join('')+(edit?'<option value="__new">+ เพิ่มปีใหม่</option>':'');
   const as=Y().athletes;if(!as.find(a=>a.id===ui.a))ui.a=(as[0]||{}).id;
-  $('#asel').innerHTML=as.map(a=>`<option value="${a.id}" ${a.id===ui.a?'selected':''}>${esc(a.name||'(ไม่มีชื่อ)')}</option>`).join('')+(edit?'<option value="__new">+ เพิ่มนักกีฬา</option>':'');
+  $('#asel').innerHTML=(as.length?as.map(a=>`<option value="${a.id}" ${a.id===ui.a?'selected':''}>${esc(a.name||'(ไม่มีชื่อ)')}</option>`).join(''):'<option value="" selected>— ยังไม่มีนักกีฬา —</option>')+(edit?'<option value="__new">+ เพิ่มนักกีฬา</option>':'');
   $('#rsel').innerHTML=MN.map((m,r)=>`<option value="${r}" ${r===ui.r?'selected':''}>เดือน ${m}</option>`).join('');
   const lb=$('#lockbtn');lb.textContent=edit?'🔓 โหมดแก้ไข (กดเพื่อล็อก)':'🔒 ใส่รหัสเพื่อแก้ไข';lb.className=edit?'on':'';
   $('#ttl').innerHTML=edit?`<input id="ttlin" value="${esc(D.title)}" title="แก้ไขชื่อหัวเว็บ">`:esc(D.title);document.title=D.title;
   let fv=document.querySelector('link[rel=icon]');if(!fv){fv=document.createElement('link');fv.rel='icon';document.head.appendChild(fv)}fv.href=$('#logo').src;
   const a=ath(),app=$('#app');
   const ban=dirty?'<div class="banner noprint">มีข้อมูลที่แก้ไขในเครื่องนี้ แต่ยังไม่ได้อัปโหลดขึ้น GitHub — กด <b>Export</b> แล้วนำไฟล์ data.json ไปอัปโหลดทับใน repo</div>':'';
-  if(!a){app.innerHTML=ban+`<div class="card empty">ปีนี้ยังไม่มีนักกีฬา ${edit?'เลือก “+ เพิ่มนักกีฬา” ที่เมนูด้านบน':'ใส่รหัสผ่านเพื่อเพิ่มข้อมูล'}</div>`;return}
+  if(!a){app.innerHTML=ban+`<div class="card empty">ปีนี้ยังไม่มีนักกีฬา ${edit?'<p style="margin:10px 0 0"><button type="button" class="btn" data-a="opennew">+ เพิ่มนักกีฬา</button></p>':'ใส่รหัสผ่านเพื่อเพิ่มข้อมูล'}</div>`;return}
   const ds=days(),o=Y().cfg.overall,tot=[];
   const by=ST.map(k=>latest(a.st[k].scores));
   ds.forEach((d,i)=>{if(by.every(m=>m[d.date]!=null))tot.push({i,date:d.date,y:by.reduce((s,m)=>s+m[d.date],0)})});
@@ -290,8 +291,8 @@ function render(){
 document.addEventListener('change',e=>{
   const t=e.target,d=t.dataset,a=ath();
   if(t.classList.contains('dpk')){const tx=t.closest('.dw')?.querySelector('.dtx');if(t.value&&tx){tx.value=fmt(t.value);tx.dispatchEvent(new Event('change',{bubbles:true}))}return}
-  if(t.id==='ysel'){if(t.value==='__new'){const y=prompt('ปีที่ต้องการเพิ่ม (ค.ศ.) เช่น 2027');if(y&&/^\d{4}$/.test(y)&&!D.years[y]){D.years[y]=newYear();ui.y=y;ui.a=null;save()}}else{ui.y=t.value;ui.a=null}return render()}
-  if(t.id==='asel'){if(t.value==='__new')openNew();else ui.a=t.value;return render()}
+  if(t.id==='ysel'){if(t.value==='__new'){openYr();return}ui.y=t.value;ui.a=null;return render()}
+  if(t.id==='asel'){if(t.value==='__new'){openNew();return}ui.a=t.value;return render()}
   if(t.id==='rsel'){ui.r=+t.value;return render()}
   if(t.id==='ttlin'){D.title=t.value;save();return render()}
   if(t.id==='imp')return doImport(t.files[0]);
@@ -324,11 +325,21 @@ function submitPw(){
   if(_pwMode==='lock'){if(p!==D.pw)return alert('รหัสผ่านไม่ถูกต้อง');edit=true;$('#pwdlg').close();render()}
   else{D.pw=p;save();$('#pwdlg').close();alert('เปลี่ยนรหัสผ่านแล้ว อย่าลืม Export และอัปโหลดขึ้น GitHub')}
 }
+function openYr(){const i=$('#yrin');i.value=String(Math.max(+ui.y+1,new Date().getFullYear()+1));$('#yrdlg').showModal();i.focus();i.select()}
+function submitYr(){
+  const y=$('#yrin').value.trim();
+  if(!/^\d{4}$/.test(y))return alert('กรุณากรอกปี ค.ศ. 4 หลัก เช่น 2027');
+  if(D.years[y])return alert('มีปี '+y+' อยู่แล้ว');
+  D.years[y]=newYear();ui.y=y;ui.a=null;save();$('#yrdlg').close();render();
+}
+$('#newdlg').addEventListener('close',()=>{if($('#asel'))$('#asel').value=ui.a||''});
+$('#yrdlg').addEventListener('close',()=>{if($('#ysel'))$('#ysel').value=ui.y||''});
 document.addEventListener('pointerdown',e=>{if(e.target.classList.contains('dpk')){const w=e.target.closest('.dw');if(w)e.target.value=parseD(w.querySelector('.dtx').value)||''}});
 document.addEventListener('focusin',e=>{if(e.target.classList.contains('dpk')){const w=e.target.closest('.dw');if(w)e.target.value=parseD(w.querySelector('.dtx').value)||''}});
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id&&e.target.id.startsWith('sc-'))addScore(e.target.id.slice(3));
   if(e.key==='Enter'&&e.target.id==='pwin'){e.preventDefault();submitPw()}
+  if(e.key==='Enter'&&e.target.id==='yrin'){e.preventDefault();submitYr()}
 });
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;const a=ath(),k=b.dataset.k,id=b.dataset.id;
@@ -336,6 +347,9 @@ document.addEventListener('click',e=>{
     case'lock':if(edit){edit=false;render()}else openPw('lock');break;
     case'pwok':submitPw();break;
     case'pwcancel':$('#pwdlg').close();break;
+    case'yrok':submitYr();break;
+    case'yrcancel':$('#yrdlg').close();break;
+    case'opennew':openNew();break;
     case'export':doExport();break;
     case'import':if(!edit)return alert('ใส่รหัสผ่านเพื่อแก้ไขก่อน Import');$('#imp').value='';$('#imp').click();break;
     case'print':window.print();break;
