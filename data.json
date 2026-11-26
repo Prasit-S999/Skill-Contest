@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795666700139,
+ "updated": 1795682612515,
  "years": {
   "2026": {
    "cfg": {
@@ -266,6 +266,13 @@
          "date": "2026-11-03",
          "problem": "Confirm Time Chart ไม่ดี",
          "counter": "ให้ยืนยันและ Confirm ซ้ำ 2 รอบ",
+         "pic": "Prasit"
+        },
+        {
+         "id": "mwxb1s6kmt1",
+         "date": "2026-11-26",
+         "problem": "ค้นหาปัญหาวงจร Relay ไม่เจอ",
+         "counter": "ให้ฝึกวิเคราะห์ Time Chart เพิ่ม",
          "pic": "Prasit"
         }
        ]
