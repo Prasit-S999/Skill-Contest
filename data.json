@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795687557164,
+ "updated": 1795687563421,
  "years": {
   "2026": {
    "cfg": {
@@ -2555,7 +2555,7 @@
      },
      "pm": {
       "name": "Plate Making",
-      "target": 20,
+      "target": 24,
       "max": 25,
       "min": 0
      }
