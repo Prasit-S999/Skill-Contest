@@ -207,8 +207,9 @@ async function load(){
   let dr=null;try{dr=JSON.parse(localStorage.getItem('skilldraft'))}catch(e){}
   if(dr&&(!f||(dr.updated||0)>(f.updated||0))){D=normalize(dr);dirty=true}
   else D=normalize(f||{});
-  const ys=Object.keys(D.years).sort();ui.y=ys[ys.length-1];
-  const n=new Date();if(String(n.getFullYear())===ui.y)ui.r=n.getMonth();
+  const ys=Object.keys(D.years).sort(),n=new Date(),cy=String(n.getFullYear());
+  ui.y=D.years[cy]?cy:ys[ys.length-1];
+  ui.r=n.getMonth();
   ui.a=(D.years[ui.y].athletes[0]||{}).id;
   render();
 }
