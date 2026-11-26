@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795685215731,
+ "updated": 1795685237223,
  "years": {
   "2026": {
    "cfg": {
@@ -895,6 +895,13 @@
          "problem": "Confirm Time Chart ไม่ดี",
          "counter": "ให้ Confirm ซ้ำ 2 รอบ",
          "pic": "Prasit"
+        },
+        {
+         "id": "mwxcmhau06t",
+         "date": "2026-11-26",
+         "problem": "",
+         "counter": "",
+         "pic": ""
         }
        ]
       },
