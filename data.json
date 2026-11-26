@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795686638516,
+ "updated": 1795687481139,
  "years": {
   "2026": {
    "cfg": {
@@ -2566,7 +2566,70 @@
      "max": 100
     }
    },
-   "athletes": []
+   "athletes": [
+    {
+     "id": "mwxdykriub9",
+     "code": "108434",
+     "name": "Mr. Jittatpong Taprongga",
+     "position": "Team Leader (G4)",
+     "section": "Maintenance & Utility",
+     "depart": "Plant Adminstation (SR)",
+     "age": "39",
+     "exp": "13",
+     "shop": "MUS-W",
+     "photo": "",
+     "sum": {
+      "tm": [
+       {
+        "l": "AP 25",
+        "plc": 43,
+        "plate": 22,
+        "weld": 18
+       },
+       {
+        "l": "CROSS PLANT 25",
+        "plc": 48,
+        "plate": 25,
+        "weld": 22
+       }
+      ],
+      "tl": [
+       {
+        "l": "AP 25",
+        "plc": 35,
+        "plate": 22,
+        "weld": 22
+       },
+       {
+        "l": "CROSS PLANT 25",
+        "plc": 34,
+        "plate": 22,
+        "weld": 23
+       }
+      ]
+     },
+     "st": {
+      "ts": {
+       "mus": "50",
+       "winner": "34",
+       "scores": [],
+       "issues": []
+      },
+      "aw": {
+       "mus": "25",
+       "winner": "23",
+       "scores": [],
+       "issues": []
+      },
+      "pm": {
+       "mus": "25",
+       "winner": "22",
+       "scores": [],
+       "issues": []
+      }
+     }
+    }
+   ]
   }
  },
  "title": "MAINTENANCE SKILL CONTEST"
