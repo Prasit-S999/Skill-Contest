@@ -9,7 +9,7 @@
 :root{color-scheme:light;--page:#fff;--bg:#f7f7f9;--card:#fff;--ink:#222a35;--mute:#6b7280;--line:#e5e7eb;--bd:#e5e7eb;--sh:rgba(0,0,0,.07);--blue:#eb0a1e;--yel:#eb0a1e;--ok:#14893c;--bad:#c4321f;--grid:#eceef2}
 
 *{box-sizing:border-box}
-html,body{margin:0}
+html,body{margin:0;overflow-x:clip}
 body{background:var(--page);color:var(--ink);font:15px/1.5 Sarabun,system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
 header.bar{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.06);color:var(--ink);padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:0;z-index:5}
 header .brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
@@ -57,8 +57,8 @@ td.l,th.l{text-align:left}
 .entry{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#eb0a1e14;border:1px dashed var(--yel);padding:8px;border-radius:6px;margin:8px 0}
 .entry input{width:auto}
 .entry input[type=number]{width:110px;font-size:20px;font-weight:700;text-align:center}
-.dtx{width:112px!important;text-align:center}.dw{position:relative;display:inline-flex;gap:4px;align-items:center}.dpk{position:absolute;left:0;bottom:0;width:100%;height:100%;opacity:0;pointer-events:none}
-.cal{background:#fff!important;color:var(--ink)!important;border:1px solid #cfd4dc!important;border-radius:6px;padding:3px 7px!important;display:inline-flex;cursor:pointer}.cal:hover{color:var(--blue)!important;border-color:var(--blue)!important}
+.dtx{width:112px!important;text-align:center}.dw{position:relative;display:inline-flex;gap:4px;align-items:center}.calw{position:relative;display:inline-flex}.dpk{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;border:0;padding:0;margin:0}.dpk::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer}
+.cal{background:#fff!important;color:var(--ink)!important;border:1px solid #cfd4dc!important;border-radius:6px;padding:3px 7px!important;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.calw:hover .cal{color:var(--blue)!important;border-color:var(--blue)!important}
 .chip.trs{background:#6b7280;border-color:#6b7280;color:#fff}.chip.trs b{color:#fff}
 .entry button.tgl{background:#fff;color:var(--ink);border:1px solid #6b7280}.entry button.tgl.on{background:#6b7280;color:#fff}.entry input:disabled{background:#e5e7eb}
 .entry button,.btn{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--blue);background:var(--blue);color:#fff;padding:5px 14px}
@@ -68,22 +68,78 @@ td.l,th.l{text-align:left}
 .entries{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
 svg{width:100%;height:auto;display:block}
 .gl{stroke:var(--grid);stroke-width:1}
-.ax{fill:var(--mute);font-size:9px}
+.ax{fill:var(--mute);font-size:10px}
 .tg{stroke:var(--ink);stroke-dasharray:5 4;stroke-width:1.5}
 .ln{fill:none;stroke:var(--ink);stroke-width:2}
 .pt{fill:var(--blue)}.pt.ok{fill:var(--ok)}
 .empty{color:var(--mute);padding:10px;text-align:center}
 .iss td{text-align:left;vertical-align:top}
-.iss td:first-child{white-space:nowrap;width:110px}
-.iss td:last-child{width:110px}
-.iss td.d{width:28px;padding:0;text-align:center}
+.iss td.d{width:34px;padding:0;text-align:center}
 .hint{font-size:13px;color:var(--mute)}
+.mhint{display:none;font-size:12px;color:var(--mute);text-align:right;margin-top:2px}
 table.sm{table-layout:fixed}.sums td.l{white-space:nowrap}.sums td.l input{font-size:13px}.sums caption{color:var(--blue)}
 dialog{border:2px solid var(--bd);border-radius:12px;box-shadow:4px 4px 0 var(--sh);background:var(--card);color:var(--ink);padding:16px;max-width:420px;width:92%}
-dialog::backdrop{background:#0007}dialog select{width:100%;font:inherit;padding:6px;margin:8px 0;border:2px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:#0007}dialog select,dialog input{width:100%;font:inherit;padding:6px 8px;margin:8px 0;border:2px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--ink)}
 .row{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-td{overflow-wrap:anywhere}.iss{table-layout:fixed}.iss td{white-space:pre-wrap}.iss th:nth-child(1){width:160px}.iss th:nth-child(4){width:120px}.iss th:nth-child(5){width:34px}
-@media(max-width:760px){.top,.sums{grid-template-columns:1fr}.prof{flex-direction:column;align-items:center}.fl{width:100%}}
+td{overflow-wrap:anywhere}.iss{table-layout:fixed}.iss td{white-space:pre-wrap}.iss th:nth-child(1),.iss td:nth-child(1){width:160px}.iss th:nth-child(4),.iss td:nth-child(4){width:120px}.iss th:nth-child(5){width:34px}
+@media screen and (max-width:760px){
+  html:not(.pm) main{padding:10px}
+  html:not(.pm) .card{padding:12px;border-radius:12px;margin-bottom:14px}
+  html:not(.pm) input,html:not(.pm) textarea,html:not(.pm) select{font-size:16px;min-height:40px;padding:6px 10px}
+  html:not(.pm) textarea{min-height:44px;line-height:1.45}
+  html:not(.pm) .btn,html:not(.pm) .entry button{min-height:42px;padding:8px 14px;font-size:15px}
+  html:not(.pm) header.bar{position:static;padding:10px 12px;gap:8px}
+  html:not(.pm) header .brand{flex:1 1 100%;margin-right:0;order:1}
+  html:not(.pm) header .logo{width:38px;height:38px}
+  html:not(.pm) header h1{font-size:17px}
+  html:not(.pm) header #ttlin{min-width:0;width:100%;max-width:100%;font-size:16px}
+  html:not(.pm) header select{max-width:none;min-height:40px;padding:6px 8px}
+  html:not(.pm) #ysel{order:2;flex:1 1 45%}
+  html:not(.pm) #rsel{order:3;flex:1 1 45%}
+  html:not(.pm) #asel{order:4;flex:1 1 100%}
+  html:not(.pm) header button{order:6;max-width:none;min-height:38px;padding:6px 10px;font-size:14px;flex:1 1 auto}
+  html:not(.pm) #lockbtn{order:5;flex:1 1 100%}
+  html:not(.pm) .top,html:not(.pm) .sums{grid-template-columns:1fr}
+  html:not(.pm) .prof{flex-direction:column;align-items:center}
+  html:not(.pm) .fl{width:100%;grid-template-columns:92px 1fr;gap:6px 8px}
+  html:not(.pm) .photo label{padding:6px 10px;font-size:14px}
+  html:not(.pm) .tblw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  html:not(.pm) .sums td.l{white-space:normal;line-height:1.25;font-size:13px}
+  html:not(.pm) .sums td.l input{font-size:16px;padding:4px 6px;min-height:36px}
+  html:not(.pm) table.sm th,html:not(.pm) table.sm td{padding:6px 4px;font-size:13px}
+  html:not(.pm) table.sm input{padding:4px 2px;min-height:36px;font-size:16px}
+  html:not(.pm) .st{border-left-width:4px}
+  html:not(.pm) .sthead{flex-direction:column;align-items:stretch;gap:8px}
+  html:not(.pm) h3 input.nm{width:100%;min-width:0}
+  html:not(.pm) .sthead .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  html:not(.pm) .meta label{display:flex;flex-direction:column;align-items:stretch;gap:2px;font-size:13px}
+  html:not(.pm) .meta input{width:100%;min-width:0;text-align:left}
+  html:not(.pm) .entry{gap:8px;padding:10px}
+  html:not(.pm) .entry>b{flex:1 1 100%}
+  html:not(.pm) .entry .dw{flex:1 1 165px}
+  html:not(.pm) .entry .dw .dtx{flex:1;width:auto!important;min-width:0}
+  html:not(.pm) .entry input[type=number]{flex:1 1 110px;width:auto;min-height:42px;font-size:20px}
+  html:not(.pm) .entry button{flex:1 1 110px}
+  html:not(.pm) .cal{min-width:40px;min-height:40px;padding:6px!important}
+  html:not(.pm) .entries{gap:6px}
+  html:not(.pm) .entries .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 6px 3px 10px}
+  html:not(.pm) .x{min-width:30px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;padding:0}
+  html:not(.pm) .chw-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px 4px}
+  html:not(.pm) .chw-scroll svg{min-width:640px}
+  html:not(.pm) .mhint{display:block}
+  html:not(.pm) .iss,html:not(.pm) .iss tbody,html:not(.pm) .iss tr,html:not(.pm) .iss td{display:block;width:100%!important}
+  html:not(.pm) .iss tr:first-child{display:none}
+  html:not(.pm) .iss tr:not(:first-child){border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--bg);position:relative}
+  html:not(.pm) .iss td{border:0;padding:4px 0;text-align:left;white-space:pre-wrap}
+  html:not(.pm) .iss td[data-lbl]::before{content:attr(data-lbl);display:block;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  html:not(.pm) .iss td:first-child{padding-right:40px}
+  html:not(.pm) .iss td.d{position:absolute;top:6px;right:6px;width:auto!important;padding:0}
+  html:not(.pm) .iss td.d .x{min-width:36px;min-height:36px;background:#fff;border:1px solid var(--line);border-radius:8px}
+  html:not(.pm) .iss td.empty{text-align:center;padding:12px 4px;white-space:normal}
+  html:not(.pm) .iss .dw{width:100%;max-width:220px}
+  html:not(.pm) .iss .dw .dtx{flex:1;width:auto!important}
+  html:not(.pm) .isw p .btn{width:100%}
+}
 @page{size:A3 landscape;margin:8mm}
 @media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .ptitle{display:none}
@@ -116,6 +172,7 @@ html.pm .ptitle b{color:var(--blue)}html.pm .ptitle span{color:var(--mute);font-
 </header>
 <main id="app"></main>
 <dialog id="newdlg"><h2>เพิ่มนักกีฬา</h2><p class="hint">เลือกคนที่จะคัดลอกข้อมูลมาเป็นต้นแบบ แล้วค่อยแก้ไขทีหลัง<br>คัดลอก: ชื่อ รหัส ตำแหน่ง Section แผนก อายุ ประสบการณ์ Shop ตาราง TM/TL และ MUS/Winner (ไม่คัดลอกรูปและคะแนน)</p><select id="cpsrc"></select><div class="row"><button class="btn ghost" data-a="newcancel">ยกเลิก</button><button class="btn" data-a="newok">เพิ่มนักกีฬา</button></div></dialog>
+<dialog id="pwdlg"><h2 id="pwttl">ใส่รหัสผ่าน</h2><p class="hint" id="pwmsg"></p><input type="password" id="pwin" autocomplete="current-password" placeholder="รหัสผ่าน"><div class="row"><button type="button" class="btn ghost" data-a="pwcancel">ยกเลิก</button><button type="button" class="btn" data-a="pwok">ตกลง</button></div></dialog>
 <script>
 const ST=['ts','aw','pm'];
 const MN=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -125,7 +182,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
 const CAL='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
-const dateIn=(attr,iso)=>`<span class="dw noprint"><input class="dtx" inputmode="numeric" placeholder="วว/ดด/ปปปป" maxlength="10" ${attr} value="${fmt(iso)}"><button type="button" class="cal" data-a="cal" title="เลือกจากปฏิทิน" aria-label="เลือกจากปฏิทิน">${CAL}</button><input type="date" class="dpk" tabindex="-1" aria-hidden="true"></span>`;
+const dateIn=(attr,iso)=>`<span class="dw noprint"><input class="dtx" inputmode="numeric" placeholder="วว/ดด/ปปปป" maxlength="10" ${attr} value="${fmt(iso)}"><span class="calw"><button type="button" class="cal" tabindex="-1" aria-hidden="true">${CAL}</button><input type="date" class="dpk" aria-label="เลือกจากปฏิทิน" value="${esc(iso||'')}"></span></span>`;
 function fmt(i){return i?i.slice(8,10)+'/'+i.slice(5,7)+'/'+i.slice(0,4):''}
 function parseD(t){const m=String(t).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);if(!m)return null;let y=+m[3];if(y>2400)y-=543;const d=new Date(y,+m[2]-1,+m[1]);if(d.getFullYear()!==y||d.getMonth()!==+m[2]-1||d.getDate()!==+m[1])return null;return y+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0')}
 const num=v=>v===''||v==null||isNaN(+v)?0:+v;
@@ -168,15 +225,15 @@ function chart(pts,ds,min,max,target,tr){
   const X=i=>L+(i+.5)*gw/n,Yv=v=>T+(1-(Math.min(max,Math.max(min,v))-min)/(max-min||1))*(H-T-B);
   const rg=max-min,step=rg>50?10:rg>20?5:rg>10?2:1;let g='';
   for(let v=Math.ceil(min/step)*step;v<=max;v+=step)g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${Yv(v)}" y2="${Yv(v)}"/><text class="ax" x="${L-4}" y="${Yv(v)+3}" text-anchor="end">${v}</text>`;
-  ds.forEach((d,i)=>{g+=`<line class="gl" x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}"/><text class="ax" x="${X(i)}" y="${H-B+11}" text-anchor="middle">${d.d}</text>`});
-  const mid=`<text class="ax" style="font-size:11px;font-weight:700" x="${W/2}" y="${H-6}" text-anchor="middle">${MN[ui.r]} ${ui.y}</text>`;
+  ds.forEach((d,i)=>{g+=`<line class="gl" x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}"/><text class="ax" x="${X(i)}" y="${H-B+12}" text-anchor="middle">${d.d}</text>`});
+  const mid=`<text class="ax" style="font-size:11.5px;font-weight:700" x="${W/2}" y="${H-5}" text-anchor="middle">${MN[ui.r]} ${ui.y}</text>`;
 
 
-  g+=`<line class="tg" x1="${L}" x2="${W-R}" y1="${Yv(target)}" y2="${Yv(target)}"/><text class="ax" x="${W-R}" y="${Yv(target)-3}" text-anchor="end" style="fill:var(--ink);font-size:10px;font-weight:700">Target ${target}</text>`;
-  const tb=(tr||[]).map(i=>`<rect x="${X(i)-gw/n/2+1}" y="${T}" width="${gw/n-2}" height="${H-B-T}" fill="#6b7280"><title>${fmt(ds[i].date)}: Training</title></rect><text x="${X(i)}" y="${T+(H-B-T)/2}" fill="#fff" font-size="10" font-weight="700" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 ${X(i)} ${T+(H-B-T)/2})">Training</text>`).join('');
+  g+=`<line class="tg" x1="${L}" x2="${W-R}" y1="${Yv(target)}" y2="${Yv(target)}"/><text class="ax" x="${W-R}" y="${Yv(target)-4}" text-anchor="end" style="fill:var(--ink);font-size:11px;font-weight:700">Target ${target}</text>`;
+  const tb=(tr||[]).map(i=>`<rect x="${X(i)-gw/n/2+1}" y="${T}" width="${gw/n-2}" height="${H-B-T}" fill="#6b7280"><title>${fmt(ds[i].date)}: Training</title></rect><text x="${X(i)}" y="${T+(H-B-T)/2}" fill="#fff" font-size="10.5" font-weight="700" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 ${X(i)} ${T+(H-B-T)/2})">Training</text>`).join('');
   const line=pts.map((p,k)=>(k?'L':'M')+X(p.i)+' '+Yv(p.y)).join(' ');
-  const dots=pts.map(p=>`<circle class="pt ${p.y>=target?'ok':''}" cx="${X(p.i)}" cy="${Yv(p.y)}" r="4.5"><title>${fmt(p.date)}: ${p.y}</title></circle><text class="ax" x="${X(p.i)}" y="${Yv(p.y)-8}" text-anchor="middle" style="fill:var(--ink);font-size:10px">${p.y}</text>`).join('');
-  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟคะแนน">${g}${tb}${mid}<path class="ln" d="${line}"/>${dots}</svg>`}
+  const dots=pts.map(p=>`<circle class="pt ${p.y>=target?'ok':''}" cx="${X(p.i)}" cy="${Yv(p.y)}" r="4.5"><title>${fmt(p.date)}: ${p.y}</title></circle><text class="ax" x="${X(p.i)}" y="${Yv(p.y)-8}" text-anchor="middle" style="fill:var(--ink);font-size:11px">${p.y}</text>`).join('');
+  return`<div class="chw-scroll"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟคะแนน">${g}${tb}${mid}<path class="ln" d="${line}"/>${dots}</svg></div><div class="mhint noprint">↔ เลื่อนซ้าย-ขวาเพื่อดูกราฟเต็ม</div>`}
 
 const fld=(label,key,v,type)=>`<span>${label}</span>`+(edit?`<input data-f="${key}" ${type?`type="${type}"`:''} value="${esc(v)}" ${key==='name'||key==='code'?'data-r="1"':''}>`:`<b>${esc(v)||'–'}</b>`);
 
@@ -184,7 +241,7 @@ function sumTbl(title,k,a){
   const rows=a.sum[k].map((r,i)=>{const t=num(r.plc)+num(r.plate)+num(r.weld);
     const c=f=>edit?`<input type="number" data-sum="${k}.${i}.${f}" data-r="1" value="${r[f]}">`:r[f];
     return`<tr><td class="l">${edit?`<input data-sum="${k}.${i}.l" value="${esc(r.l)}">`:esc(r.l)}</td><td>${c('plc')}</td><td>${c('plate')}</td><td>${c('weld')}</td><td><b>${t}</b></td></tr>`}).join('');
-  return`<table class="sm"><caption>${title}</caption><colgroup><col style="width:34%"><col><col><col><col></colgroup><tr><th></th><th>PLC</th><th>Plate</th><th>Welding</th><th>Total</th></tr>${rows}</table>`}
+  return`<div class="tblw"><table class="sm"><caption>${title}</caption><colgroup><col style="width:34%"><col><col><col><col></colgroup><tr><th></th><th>PLC</th><th>Plate</th><th>Welding</th><th>Total</th></tr>${rows}</table></div>`}
 
 function stCard(k,a,ds){
   const c=Y().cfg.st[k],s=a.st[k],by=latest(s.scores),a0=ds[0].date,a1=ds[ds.length-1].date;
@@ -196,7 +253,7 @@ function stCard(k,a,ds){
   const ents=edit?`<div class="entries noprint">${mine.slice(0,12).map(x=>`<span class="chip ${x.training?'trs':''}">${x.date.slice(8)}/${x.date.slice(5,7)} · ${x.training?'<b>Training</b>':`<b>${x.score}</b>`}${edit?` <button class="x" data-a="delsc" data-k="${k}" data-id="${x.id}" title="ลบ">✕</button>`:''}</span>`).join('')}</div>`:'';
   const form=edit?`<div class="entry noprint"><b>ลงคะแนน</b>${dateIn(`id="dt-${k}"`,defDate())}<input type="number" step="any" inputmode="decimal" id="sc-${k}" placeholder="คะแนน"><button type="button" class="tgl" data-a="trtoggle" data-k="${k}" id="tr-${k}" aria-pressed="false" title="ช่วงฝึกซ้อม ยังไม่เก็บคะแนน">Training</button><button data-a="addsc" data-k="${k}">บันทึก</button></div>`:'';
   const iss=s.issues.filter(x=>x.date>=a0&&x.date<=a1).sort((x,y)=>x.date<y.date?-1:1);
-  const ir=iss.map(x=>`<tr><td>${edit?`${dateIn(`data-i="${k}.${x.id}.date"`,x.date)}`:fmt(x.date)}</td><td>${edit?`<textarea data-i="${k}.${x.id}.problem">${esc(x.problem)}</textarea>`:esc(x.problem)}</td><td>${edit?`<textarea data-i="${k}.${x.id}.counter">${esc(x.counter)}</textarea>`:esc(x.counter)}</td><td>${edit?`<input data-i="${k}.${x.id}.pic" value="${esc(x.pic)}">`:esc(x.pic)}</td>${edit?`<td class="d noprint"><button class="x" data-a="deliss" data-k="${k}" data-id="${x.id}">✕</button></td>`:''}</tr>`).join('');
+  const ir=iss.map(x=>`<tr><td data-lbl="DATE">${edit?`${dateIn(`data-i="${k}.${x.id}.date"`,x.date)}`:fmt(x.date)}</td><td data-lbl="PROBLEM (จุดที่ถูกตัดคะแนน)">${edit?`<textarea data-i="${k}.${x.id}.problem">${esc(x.problem)}</textarea>`:esc(x.problem)}</td><td data-lbl="COUNTERMEASURE (วิธีแก้ไข)">${edit?`<textarea data-i="${k}.${x.id}.counter">${esc(x.counter)}</textarea>`:esc(x.counter)}</td><td data-lbl="PIC">${edit?`<input data-i="${k}.${x.id}.pic" value="${esc(x.pic)}">`:esc(x.pic)}</td>${edit?`<td class="d noprint"><button class="x" data-a="deliss" data-k="${k}" data-id="${x.id}" aria-label="ลบรายการ">✕</button></td>`:''}</tr>`).join('');
   return`<section class="card st"><div class="sthead"><h3>${edit?`<input data-cfg="${k}.name" value="${esc(c.name)}" class="nm">`:esc(c.name)}</h3>
   <div class="meta"><label>MUS 2025 ${edit?`<input data-s="${k}.mus" placeholder="เช่น 38 คะแนน" value="${esc(s.mus)}">`:`<b>${esc(s.mus)||'ยังไม่ระบุ'}</b>`}</label><label>Winner Cross Plant ${edit?`<input data-s="${k}.winner" placeholder="เช่น ชื่อ / คะแนน" value="${esc(s.winner)}">`:`<b>${esc(s.winner)||'ยังไม่ระบุ'}</b>`}</label><label>Target ${edit?`<input type="number" data-cfg="${k}.target" data-r="1" value="${c.target}">`:`<b>${c.target}</b>`}</label>${edit?`<label>กราฟต่ำสุด<input type="number" data-cfg="${k}.min" data-r="1" value="${c.min}"></label><label>เต็ม<input type="number" data-cfg="${k}.max" data-r="1" value="${c.max}"></label>`:''}</div></div>
   <div class="stats">${stats}${trIdx.length?`<span class="chip trs">Training <b>${trIdx.length}</b> วัน</span>`:''}</div><div class="stb"><div class="chw">${chart(pts,ds,c.min,c.max,c.target,trIdx)}${form}${ents}</div><div class="isw">
@@ -255,11 +312,30 @@ document.addEventListener('change',e=>{
   save();if(d.r)render();else if(dirty&&!$('.banner'))render();
 });
 
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id&&e.target.id.startsWith('sc-'))addScore(e.target.id.slice(3))});
+let _pwMode='lock';
+function openPw(mode){
+  _pwMode=mode;$('#pwttl').textContent=mode==='lock'?'ใส่รหัสผ่านเพื่อแก้ไขข้อมูล':'เปลี่ยนรหัสผ่าน';
+  $('#pwmsg').textContent=mode==='lock'?'กรอกรหัสผ่านสำหรับปลดล็อกโหมดแก้ไข':'กำหนดรหัสผ่านใหม่ (อย่าลืม Export อัปโหลดขึ้น GitHub)';
+  const i=$('#pwin');i.value='';i.autocomplete=mode==='lock'?'current-password':'new-password';
+  $('#pwdlg').showModal();i.focus();
+}
+function submitPw(){
+  const p=$('#pwin').value;if(!p)return;
+  if(_pwMode==='lock'){if(p!==D.pw)return alert('รหัสผ่านไม่ถูกต้อง');edit=true;$('#pwdlg').close();render()}
+  else{D.pw=p;save();$('#pwdlg').close();alert('เปลี่ยนรหัสผ่านแล้ว อย่าลืม Export และอัปโหลดขึ้น GitHub')}
+}
+document.addEventListener('pointerdown',e=>{if(e.target.classList.contains('dpk')){const w=e.target.closest('.dw');if(w)e.target.value=parseD(w.querySelector('.dtx').value)||''}});
+document.addEventListener('focusin',e=>{if(e.target.classList.contains('dpk')){const w=e.target.closest('.dw');if(w)e.target.value=parseD(w.querySelector('.dtx').value)||''}});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id&&e.target.id.startsWith('sc-'))addScore(e.target.id.slice(3));
+  if(e.key==='Enter'&&e.target.id==='pwin'){e.preventDefault();submitPw()}
+});
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;const a=ath(),k=b.dataset.k,id=b.dataset.id;
   switch(b.dataset.a){
-    case'lock':if(edit){edit=false}else{const p=prompt('ใส่รหัสผ่านเพื่อแก้ไขข้อมูล');if(p===null)return;if(p!==D.pw)return alert('รหัสผ่านไม่ถูกต้อง');edit=true}render();break;
+    case'lock':if(edit){edit=false;render()}else openPw('lock');break;
+    case'pwok':submitPw();break;
+    case'pwcancel':$('#pwdlg').close();break;
     case'export':doExport();break;
     case'import':if(!edit)return alert('ใส่รหัสผ่านเพื่อแก้ไขก่อน Import');$('#imp').value='';$('#imp').click();break;
     case'print':window.print();break;
@@ -267,13 +343,12 @@ document.addEventListener('click',e=>{
     case'newcancel':$('#newdlg').close();break;
     case'photo':$('#photoin').value='';$('#photoin').click();break;
     case'addsc':addScore(k);break;
-    case'cal':{const w=b.closest('.dw'),pk=w.querySelector('.dpk'),tx=w.querySelector('.dtx');pk.value=parseD(tx.value)||'';try{pk.showPicker()}catch(_){pk.focus();pk.click()}}break;
     case'trtoggle':{b.classList.toggle('on');const on=b.classList.contains('on'),inp=$('#sc-'+k);inp.disabled=on;if(on)inp.value='';inp.placeholder=on?'ไม่มีคะแนน':'คะแนน';b.setAttribute('aria-pressed',on)}break;
     case'delsc':a.st[k].scores=a.st[k].scores.filter(x=>x.id!==id);save();render();break;
     case'addiss':a.st[k].issues.push({id:uid(),date:defDate(),problem:'',counter:'',pic:''});save();render();break;
     case'deliss':a.st[k].issues=a.st[k].issues.filter(x=>x.id!==id);save();render();break;
     case'delath':if(confirm('ลบ “'+(a.name||'นักกีฬา')+'” และข้อมูลทั้งหมดของคนนี้?')){Y().athletes=Y().athletes.filter(x=>x.id!==a.id);ui.a=null;save();render()}break;
-    case'pw':{const p=prompt('รหัสผ่านใหม่');if(p){D.pw=p;save();alert('เปลี่ยนรหัสผ่านแล้ว อย่าลืม Export และอัปโหลดขึ้น GitHub')}}break;
+    case'pw':openPw('pw');break;
   }});
 
 function openNew(){
