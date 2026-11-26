@@ -184,7 +184,7 @@ const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4)
 const CAL='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
 const dateIn=(attr,iso)=>`<span class="dw noprint"><input class="dtx" inputmode="numeric" placeholder="วว/ดด/ปปปป" maxlength="10" ${attr} value="${fmt(iso)}"><span class="calw"><button type="button" class="cal" tabindex="-1" aria-hidden="true">${CAL}</button><input type="date" class="dpk" aria-label="เลือกจากปฏิทิน" value="${esc(iso||'')}"></span></span>`;
 function fmt(i){return i?i.slice(8,10)+'/'+i.slice(5,7)+'/'+i.slice(0,4):''}
-function parseD(t){const m=String(t).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);if(!m)return null;let y=+m[3];if(y>2400)y-=543;const d=new Date(y,+m[2]-1,+m[1]);if(d.getFullYear()!==y||d.getMonth()!==+m[2]-1||d.getDate()!==+m[1])return null;return y+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0')}
+function parseD(t){const m=String(t).trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/);if(!m)return null;let y=+m[3];if(m[3].length===2)y=y+1957===+ui.y?y+1957:2000+y;else if(y>2400)y-=543;const d=new Date(y,+m[2]-1,+m[1]);if(d.getFullYear()!==y||d.getMonth()!==+m[2]-1||d.getDate()!==+m[1])return null;return y+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0')}
 const num=v=>v===''||v==null||isNaN(+v)?0:+v;
 const rname=r=>MN[r];
 
@@ -250,7 +250,7 @@ function stCard(k,a,ds){
   const ys=pts.map(p=>p.y),last=ys[ys.length-1];
   const stats=ys.length?`<span class="chip ${last>=c.target?'ok':'bad'}">ล่าสุด <b>${last}</b></span><span class="chip">สูงสุด <b>${Math.max(...ys)}</b></span><span class="chip">เฉลี่ย <b>${(ys.reduce((x,y)=>x+y,0)/ys.length).toFixed(1)}</b></span><span class="chip">ถึงเป้า <b>${ys.filter(v=>v>=c.target).length}/${ys.length}</b> วัน</span>`:'<span class="hint">ยังไม่มีคะแนนในรอบนี้</span>';
   const mine=s.scores.filter(x=>x.date>=a0&&x.date<=a1).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:(y.t||0)-(x.t||0));
-  const ents=edit?`<div class="entries noprint">${mine.slice(0,12).map(x=>`<span class="chip ${x.training?'trs':''}">${x.date.slice(8)}/${x.date.slice(5,7)} · ${x.training?'<b>Training</b>':`<b>${x.score}</b>`}${edit?` <button class="x" data-a="delsc" data-k="${k}" data-id="${x.id}" title="ลบ">✕</button>`:''}</span>`).join('')}</div>`:'';
+  const ents=edit?`<div class="entries noprint">${mine.map(x=>`<span class="chip ${x.training?'trs':''}">${x.date.slice(8)}/${x.date.slice(5,7)} · ${x.training?'<b>Training</b>':`<b>${x.score}</b>`}${edit?` <button class="x" data-a="delsc" data-k="${k}" data-id="${x.id}" title="ลบ">✕</button>`:''}</span>`).join('')}</div>`:'';
   const form=edit?`<div class="entry noprint"><b>ลงคะแนน</b>${dateIn(`id="dt-${k}"`,defDate())}<input type="number" step="any" inputmode="decimal" id="sc-${k}" placeholder="คะแนน"><button type="button" class="tgl" data-a="trtoggle" data-k="${k}" id="tr-${k}" aria-pressed="false" title="ช่วงฝึกซ้อม ยังไม่เก็บคะแนน">Training</button><button data-a="addsc" data-k="${k}">บันทึก</button></div>`:'';
   const iss=s.issues.filter(x=>x.date>=a0&&x.date<=a1).sort((x,y)=>x.date<y.date?-1:1);
   const ir=iss.map(x=>`<tr><td data-lbl="DATE">${edit?`${dateIn(`data-i="${k}.${x.id}.date"`,x.date)}`:fmt(x.date)}</td><td data-lbl="PROBLEM (จุดที่ถูกตัดคะแนน)">${edit?`<textarea data-i="${k}.${x.id}.problem">${esc(x.problem)}</textarea>`:esc(x.problem)}</td><td data-lbl="COUNTERMEASURE (วิธีแก้ไข)">${edit?`<textarea data-i="${k}.${x.id}.counter">${esc(x.counter)}</textarea>`:esc(x.counter)}</td><td data-lbl="PIC">${edit?`<input data-i="${k}.${x.id}.pic" value="${esc(x.pic)}">`:esc(x.pic)}</td>${edit?`<td class="d noprint"><button class="x" data-a="deliss" data-k="${k}" data-id="${x.id}" aria-label="ลบรายการ">✕</button></td>`:''}</tr>`).join('');
@@ -289,7 +289,7 @@ function render(){
 
 document.addEventListener('change',e=>{
   const t=e.target,d=t.dataset,a=ath();
-  if(t.classList.contains('dpk')){const tx=t.parentNode.querySelector('.dtx');if(t.value){tx.value=fmt(t.value);tx.dispatchEvent(new Event('change',{bubbles:true}))}return}
+  if(t.classList.contains('dpk')){const tx=t.closest('.dw')?.querySelector('.dtx');if(t.value&&tx){tx.value=fmt(t.value);tx.dispatchEvent(new Event('change',{bubbles:true}))}return}
   if(t.id==='ysel'){if(t.value==='__new'){const y=prompt('ปีที่ต้องการเพิ่ม (ค.ศ.) เช่น 2027');if(y&&/^\d{4}$/.test(y)&&!D.years[y]){D.years[y]=newYear();ui.y=y;ui.a=null;save()}}else{ui.y=t.value;ui.a=null}return render()}
   if(t.id==='asel'){if(t.value==='__new')openNew();else ui.a=t.value;return render()}
   if(t.id==='rsel'){ui.r=+t.value;return render()}
@@ -299,7 +299,7 @@ document.addEventListener('change',e=>{
   if(t.id&&t.id.startsWith('dt-')){const iso=parseD(t.value);
     if(!iso){alert('รูปแบบวันที่ไม่ถูกต้อง ใช้ วว/ดด/ปปปป เช่น 02/11/2026');t.value=fmt(defDate());return}
     if(iso.slice(0,4)!==ui.y){alert('ปีของวันที่ไม่ตรงกับปี '+ui.y+' ที่เลือกอยู่');t.value=fmt(defDate());return}
-    ui.dt=iso;return}
+    ui.dt=iso;t.value=fmt(iso);return}
   if(!edit||!a)return;
   if(d.f)a[d.f]=t.value;
   else if(d.sum){const[k,i,f]=d.sum.split('.');a.sum[k][i][f]=f==='l'?t.value:num(t.value)}
