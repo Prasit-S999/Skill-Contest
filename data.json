@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795687502997,
+ "updated": 1795687511046,
  "years": {
   "2026": {
    "cfg": {
@@ -2686,6 +2686,68 @@
       "pm": {
        "mus": "25",
        "winner": "22",
+       "scores": [],
+       "issues": []
+      }
+     }
+    },
+    {
+     "id": "mwxdz9h0022",
+     "code": "71004018",
+     "name": "Mr. Nonthakit Udomsin",
+     "position": "Team Member (G3)",
+     "section": "Maintenance & Utility",
+     "depart": "Plant Adminstation (SR)",
+     "age": "23",
+     "exp": "1",
+     "shop": "MUS-W",
+     "photo": "",
+     "sum": {
+      "tm": [
+       {
+        "l": "AP 25",
+        "plc": 43,
+        "plate": 22,
+        "weld": 18
+       },
+       {
+        "l": "CROSS PLANT 25",
+        "plc": 48,
+        "plate": 25,
+        "weld": 22
+       }
+      ],
+      "tl": [
+       {
+        "l": "AP 25",
+        "plc": 35,
+        "plate": 22,
+        "weld": 22
+       },
+       {
+        "l": "CROSS PLANT 25",
+        "plc": 34,
+        "plate": 22,
+        "weld": 23
+       }
+      ]
+     },
+     "st": {
+      "ts": {
+       "mus": "50",
+       "winner": "48",
+       "scores": [],
+       "issues": []
+      },
+      "aw": {
+       "mus": "25",
+       "winner": "22",
+       "scores": [],
+       "issues": []
+      },
+      "pm": {
+       "mus": "25",
+       "winner": "25",
        "scores": [],
        "issues": []
       }
