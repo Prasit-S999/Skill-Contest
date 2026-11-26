@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795686525390,
+ "updated": 1795686595753,
  "years": {
   "2026": {
    "cfg": {
@@ -2144,6 +2144,13 @@
          "problem": "มอง Interlock Time Chart ไม่ออก",
          "counter": "ให้ฝึกมอง Time Chart ที่มีความหลากหลายมากขึ้น",
          "pic": "Prasit"
+        },
+        {
+         "id": "mwxdfk7iuuu",
+         "date": "2026-11-26",
+         "problem": "",
+         "counter": "",
+         "pic": ""
         }
        ]
       },
