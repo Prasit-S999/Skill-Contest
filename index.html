@@ -142,6 +142,22 @@ td{overflow-wrap:anywhere}.iss{table-layout:fixed}.iss td{white-space:pre-wrap}.
   html:not(.pm) .iss .dw .dtx{flex:1;width:auto!important}
   html:not(.pm) .isw p .btn{width:100%}
 }
+.isbtn,.chev,.isall{display:none}
+@media screen and (max-width:760px){
+  html:not(.pm) .isbtn{display:flex;width:100%;justify-content:space-between;align-items:center;gap:8px;min-height:44px;padding:8px 12px;margin:2px 0 8px;font:inherit;font-weight:700;color:var(--blue);background:#fdecee;border:1px solid #f3b4ba;border-radius:10px;cursor:pointer;text-align:left}
+  html:not(.pm) .isbtn i{font-style:normal;transition:transform .15s}
+  html:not(.pm) .isc .isbtn i{transform:rotate(-90deg)}
+  html:not(.pm) .isall{display:block;margin:0 0 8px auto;padding:4px 2px;font:inherit;font-size:13px;color:var(--blue);background:none;border:0;text-decoration:underline;cursor:pointer}
+  html:not(.pm) .isc .iss,html:not(.pm) .isc .isall{display:none}
+  html:not(.pm) .iss.v tr.ir{cursor:pointer;padding:8px 34px 8px 12px;margin-bottom:8px}
+  html:not(.pm) .iss.v td:nth-child(1)::before,html:not(.pm) .iss.v td:nth-child(2)::before{display:none}
+  html:not(.pm) .iss.v td:nth-child(1){padding:0 0 2px;font-size:12.5px;font-weight:700;color:var(--mute)}
+  html:not(.pm) .iss.v tr.ir:not(.open) td:nth-child(2){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-bottom:0;white-space:normal}
+  html:not(.pm) .iss.v tr.ir:not(.open) td:nth-child(n+3){display:none}
+  html:not(.pm) .iss.v tr.ir.open td:nth-child(3){margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+  html:not(.pm) .iss.v .chev{display:block;position:absolute;right:14px;top:14px;width:8px;height:8px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg);transition:transform .15s}
+  html:not(.pm) .iss.v tr.ir.open .chev{transform:rotate(-135deg);top:17px}
+}
 @page{size:A3 landscape;margin:8mm}
 @media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .ptitle{display:none}
@@ -184,7 +200,7 @@ html.pm .ptitle b{color:var(--blue)}html.pm .ptitle span{color:var(--mute);font-
 <script>
 const ST=['ts','aw','pm'];
 const MN=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-let D,ui={y:null,a:null,r:0,dt:'',dts:{}},edit=false,dirty=false;
+let D,ui={y:null,a:null,r:0,dt:'',dts:{},io:{},ro:{}},edit=false,dirty=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
@@ -317,11 +333,13 @@ function stCard(k,a,ds){
   const ents=edit?`<div class="entries noprint">${mine.map(x=>`<span class="chip ${x.training?'trs':x.holiday?'hol':''}">${x.date.slice(8)}/${x.date.slice(5,7)} · ${x.training?'<b>Training</b>':x.holiday?'<b>Holiday</b>':`<input class="ce" type="number" step="any" inputmode="decimal" data-ce="${k}.${x.id}" value="${x.score}" aria-label="แก้คะแนน">`}${edit?` <button class="x" data-a="delsc" data-k="${k}" data-id="${x.id}" title="ลบ">✕</button>`:''}</span>`).join('')}</div>`:'';
   const form=edit?`<div class="entry noprint"><b>ลงคะแนน</b>${dateIn(`id="dt-${k}"`,defDateK(k))}<input type="number" step="any" inputmode="decimal" id="sc-${k}" placeholder="คะแนน"><button type="button" class="tgl" data-a="trtoggle" data-k="${k}" id="tr-${k}" aria-pressed="false" title="ช่วงฝึกซ้อม ยังไม่เก็บคะแนน">Training</button><button type="button" class="tgl hol" data-a="trtoggle" data-k="${k}" id="hl-${k}" aria-pressed="false" title="วันหยุด ไม่มีการฝึกซ้อม">Holiday</button><label class="all" id="al-${k}" hidden><input type="checkbox" id="all-${k}" checked> ใช้กับทั้ง 3 สถานี</label><button data-a="addsc" data-k="${k}">บันทึก</button></div>`:'';
   const iss=s.issues.filter(x=>x.date>=a0&&x.date<=a1).sort((x,y)=>x.date<y.date?-1:1);
-  const ir=iss.map(x=>`<tr><td data-lbl="DATE">${edit?`${dateIn(`data-i="${k}.${x.id}.date"`,x.date)}`:fmt(x.date)}</td><td data-lbl="PROBLEM (จุดที่ถูกตัดคะแนน)">${edit?`<textarea data-i="${k}.${x.id}.problem">${esc(x.problem)}</textarea>`:esc(x.problem)}</td><td data-lbl="COUNTERMEASURE (วิธีแก้ไข)">${edit?`<textarea data-i="${k}.${x.id}.counter">${esc(x.counter)}</textarea>`:esc(x.counter)}</td><td data-lbl="PIC">${edit?`<input data-i="${k}.${x.id}.pic" value="${esc(x.pic)}">`:esc(x.pic)}</td>${edit?`<td class="d noprint"><button class="x" data-a="deliss" data-k="${k}" data-id="${x.id}" aria-label="ลบรายการ">✕</button></td>`:''}</tr>`).join('');
+  const ir=iss.map(x=>`<tr class="ir ${ui.ro[x.id]?'open':''}" data-iid="${x.id}"><td data-lbl="DATE">${edit?`${dateIn(`data-i="${k}.${x.id}.date"`,x.date)}`:fmt(x.date)+'<i class="chev"></i>'}</td><td data-lbl="PROBLEM (จุดที่ถูกตัดคะแนน)">${edit?`<textarea data-i="${k}.${x.id}.problem">${esc(x.problem)}</textarea>`:esc(x.problem)}</td><td data-lbl="COUNTERMEASURE (วิธีแก้ไข)">${edit?`<textarea data-i="${k}.${x.id}.counter">${esc(x.counter)}</textarea>`:esc(x.counter)}</td><td data-lbl="PIC">${edit?`<input data-i="${k}.${x.id}.pic" value="${esc(x.pic)}">`:esc(x.pic)}</td>${edit?`<td class="d noprint"><button class="x" data-a="deliss" data-k="${k}" data-id="${x.id}" aria-label="ลบรายการ">✕</button></td>`:''}</tr>`).join('');
+  const nI=iss.length,io=ui.io[k]!==undefined?ui.io[k]:nI<=2,col=!edit&&nI>0&&!io,allO=nI>0&&iss.every(x=>ui.ro[x.id]);
+  const ctrl=!edit&&nI>0?`<button type="button" class="isbtn noprint" data-a="istog" data-k="${k}" aria-expanded="${!col}"><span>จุดที่ถูกตัดคะแนน (${nI} รายการ)</span><i>▾</i></button>${nI>1?`<button type="button" class="isall noprint" data-a="isall" data-k="${k}">${allO?'ย่อรายละเอียดทั้งหมด':'ดูรายละเอียดทั้งหมด'}</button>`:''}`:'';
   return`<section class="card st"><div class="sthead"><h3>${edit?`<input data-cfg="${k}.name" value="${esc(c.name)}" class="nm">`:esc(c.name)}</h3>
   <div class="meta"><label>MUS 2025 ${edit?`<input data-s="${k}.mus" placeholder="เช่น 38 คะแนน" value="${esc(s.mus)}">`:`<b>${esc(s.mus)||'ยังไม่ระบุ'}</b>`}</label><label>Winner Cross Plant ${edit?`<input data-s="${k}.winner" placeholder="เช่น ชื่อ / คะแนน" value="${esc(s.winner)}">`:`<b>${esc(s.winner)||'ยังไม่ระบุ'}</b>`}</label><label>Target ${edit?`<input type="number" data-cfg="${k}.target" data-r="1" value="${c.target}">`:`<b>${c.target}</b>`}</label>${edit?`<label>กราฟต่ำสุด<input type="number" data-cfg="${k}.min" data-r="1" value="${c.min}"></label><label>เต็ม<input type="number" data-cfg="${k}.max" data-r="1" value="${c.max}"></label>`:''}</div></div>
-  <div class="stats">${stats}${trIdx.some(o=>o.t==='T')?`<span class="chip trs">Training <b>${trIdx.filter(o=>o.t==='T').length}</b> วัน</span>`:''}${trIdx.some(o=>o.t==='H')?`<span class="chip hol">Holiday <b>${trIdx.filter(o=>o.t==='H').length}</b> วัน</span>`:''}</div><div class="stb"><div class="chw">${chart(pts,ds,c.min,c.max,c.target,trIdx)}${form}${ents}</div><div class="isw">
-  <table class="iss"><tr><th>DATE</th><th>PROBLEM (จุดที่ถูกตัดคะแนน)</th><th>COUNTERMEASURE (วิธีแก้ไข)</th><th>PIC</th>${edit?'<th class="noprint"></th>':''}</tr>${ir||`<tr><td colspan="${edit?5:4}" class="empty">ยังไม่มีรายการ</td></tr>`}</table>
+  <div class="stats">${stats}${trIdx.some(o=>o.t==='T')?`<span class="chip trs">Training <b>${trIdx.filter(o=>o.t==='T').length}</b> วัน</span>`:''}${trIdx.some(o=>o.t==='H')?`<span class="chip hol">Holiday <b>${trIdx.filter(o=>o.t==='H').length}</b> วัน</span>`:''}</div><div class="stb"><div class="chw">${chart(pts,ds,c.min,c.max,c.target,trIdx)}${form}${ents}</div><div class="isw ${col?'isc':''}">
+  ${ctrl}<table class="iss${edit?'':' v'}"><tr><th>DATE</th><th>PROBLEM (จุดที่ถูกตัดคะแนน)</th><th>COUNTERMEASURE (วิธีแก้ไข)</th><th>PIC</th>${edit?'<th class="noprint"></th>':''}</tr>${ir||`<tr><td colspan="${edit?5:4}" class="empty">ยังไม่มีรายการ</td></tr>`}</table>
   ${edit?`<p class="noprint"><button class="btn ghost" data-a="addiss" data-k="${k}">+ เพิ่มจุดที่ถูกตัดคะแนน</button></p>`:''}</div></div></section>`}
 
 function render(){
@@ -354,9 +372,9 @@ function render(){
 document.addEventListener('change',e=>{
   const t=e.target,d=t.dataset,a=ath();
   if(t.classList.contains('dpk')){const tx=t.closest('.dw')?.querySelector('.dtx');if(t.value&&tx){tx.value=fmt(t.value);tx.dispatchEvent(new Event('change',{bubbles:true}))}return}
-  if(t.id==='ysel'){if(t.value==='__new'){openYr();return}ui.y=t.value;ui.a=null;ui.dts={};return render()}
-  if(t.id==='asel'){if(t.value==='__new'){openNew();return}ui.a=t.value;ui.dts={};return render()}
-  if(t.id==='rsel'){ui.r=+t.value;return render()}
+  if(t.id==='ysel'){if(t.value==='__new'){openYr();return}ui.y=t.value;ui.a=null;ui.dts={};ui.io={};return render()}
+  if(t.id==='asel'){if(t.value==='__new'){openNew();return}ui.a=t.value;ui.dts={};ui.io={};return render()}
+  if(t.id==='rsel'){ui.r=+t.value;ui.io={};return render()}
   if(t.id==='ttlin'){D.title=t.value;save();return render()}
   if(t.id==='imp')return doImport(t.files[0]);
   if(t.id==='photoin')return doPhoto(t.files[0]);
@@ -431,6 +449,8 @@ document.addEventListener('click',e=>{
     case'deliss':a.st[k].issues=a.st[k].issues.filter(x=>x.id!==id);save();render();break;
     case'delath':if(confirm('ลบ “'+(a.name||'นักกีฬา')+'” และข้อมูลทั้งหมดของคนนี้?')){Y().athletes=Y().athletes.filter(x=>x.id!==a.id);ui.a=null;save();render()}break;
     case'pw':openPw('pw');break;
+    case'istog':{const w=b.closest('.isw'),op=w.classList.contains('isc');w.classList.toggle('isc',!op);ui.io[k]=op;b.setAttribute('aria-expanded',op)}break;
+    case'isall':{const w=b.closest('.isw'),rows=[...w.querySelectorAll('tr.ir')],all=rows.every(r=>r.classList.contains('open'));rows.forEach(r=>{r.classList.toggle('open',!all);if(all)delete ui.ro[r.dataset.iid];else ui.ro[r.dataset.iid]=true});b.textContent=all?'ดูรายละเอียดทั้งหมด':'ย่อรายละเอียดทั้งหมด'}break;
     case'sync':if(edit)openSync();else if(synced())refresh(true);break;
     case'sysave':saveSync();break;
     case'sycancel':$('#syncdlg').close();break;
@@ -496,6 +516,13 @@ window.addEventListener('afterprint',()=>{
   document.documentElement.classList.remove('pm');
   $('main').style.cssText='';document.body.style.height='';
   if(_pe){edit=true;_pe=false;render()}
+});
+document.addEventListener('click',e=>{
+  const tr=e.target.closest('.iss.v tr.ir');
+  if(!tr||e.target.closest('a,button,input,textarea,select')||!matchMedia('(max-width:760px)').matches)return;
+  tr.classList.toggle('open');if(tr.classList.contains('open'))ui.ro[tr.dataset.iid]=true;else delete ui.ro[tr.dataset.iid];
+  const w=tr.closest('.isw'),b=w.querySelector('.isall');
+  if(b)b.textContent=[...w.querySelectorAll('tr.ir')].every(r=>r.classList.contains('open'))?'ย่อรายละเอียดทั้งหมด':'ดูรายละเอียดทั้งหมด';
 });
 function grow(el){el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 const _render=render;render=function(){_render();document.querySelectorAll('textarea').forEach(grow);updSt()};
