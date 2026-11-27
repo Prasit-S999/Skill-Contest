@@ -425,7 +425,7 @@ document.addEventListener('click',e=>{
     case'newcancel':$('#newdlg').close();break;
     case'photo':$('#photoin').value='';$('#photoin').click();break;
     case'addsc':addScore(k);break;
-    case'trtoggle':{const on=!b.classList.contains('on');b.parentNode.querySelectorAll('.tgl').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')});if(on){b.classList.add('on');b.setAttribute('aria-pressed','true')}const inp=$('#sc-'+k);inp.disabled=on;if(on)inp.value='';inp.placeholder=on?'ไม่มีคะแนน':'คะแนน';$('#al-'+k).hidden=!(on&&b.id==='hl-'+k)}break;
+    case'trtoggle':{const on=!b.classList.contains('on');b.parentNode.querySelectorAll('.tgl').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')});if(on){b.classList.add('on');b.setAttribute('aria-pressed','true')}const inp=$('#sc-'+k);inp.disabled=on;if(on)inp.value='';inp.placeholder=on?'ไม่มีคะแนน':'คะแนน';$('#al-'+k).hidden=!on}break;
     case'delsc':a.st[k].scores=a.st[k].scores.filter(x=>x.id!==id);save();render();break;
     case'addiss':a.st[k].issues.push({id:uid(),date:defDate(),problem:'',counter:'',pic:''});save();render();break;
     case'deliss':a.st[k].issues=a.st[k].issues.filter(x=>x.id!==id);save();render();break;
@@ -454,7 +454,7 @@ function addScore(k){
   if(!dt||(!md&&v===''))return alert('กรุณาใส่วันที่ (วว/ดด/ปปปป) และคะแนน หรือกด Training / Holiday');
   if(dt.slice(0,4)!==ui.y)return alert('ปีของวันที่ไม่ตรงกับปี '+ui.y+' ที่เลือกอยู่');
   if(!md&&!okScore(k,+v))return;
-  const all=md==='H'&&$('#all-'+k).checked,mk=()=>md==='T'?{id:uid(),date:dt,score:null,training:true,t:Date.now()}:md==='H'?{id:uid(),date:dt,score:null,holiday:true,t:Date.now()}:{id:uid(),date:dt,score:+v,t:Date.now()};
+  const all=!!md&&$('#all-'+k).checked,mk=()=>md==='T'?{id:uid(),date:dt,score:null,training:true,t:Date.now()}:md==='H'?{id:uid(),date:dt,score:null,holiday:true,t:Date.now()}:{id:uid(),date:dt,score:+v,t:Date.now()};
   ui.dt=dt;ui.r=+dt.slice(5,7)-1;
   (all?ST:[k]).forEach(q=>{ath().st[q].scores.push(mk());advance(q,dt)});
   save();render();
