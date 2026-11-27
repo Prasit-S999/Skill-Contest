@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795748358582,
+ "updated": 1795748367217,
  "years": {
   "2026": {
    "cfg": {
@@ -900,6 +900,13 @@
          "score": null,
          "training": true,
          "t": 1795666437838
+        },
+        {
+         "id": "mwye7klvs8m",
+         "date": "2026-11-26",
+         "score": null,
+         "training": true,
+         "t": 1795748362771
         }
        ],
        "issues": [
@@ -1104,6 +1111,13 @@
          "score": null,
          "training": true,
          "t": 1795666437853
+        },
+        {
+         "id": "mwye7nct02r",
+         "date": "2026-11-26",
+         "score": null,
+         "training": true,
+         "t": 1795748366333
         }
        ],
        "issues": [
