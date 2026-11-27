@@ -60,7 +60,9 @@ td.l,th.l{text-align:left}
 .dtx{width:112px!important;text-align:center}.dw{position:relative;display:inline-flex;gap:4px;align-items:center}.calw{position:relative;display:inline-flex}.dpk{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;border:0;padding:0;margin:0}.dpk::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer}
 .cal{background:#fff!important;color:var(--ink)!important;border:1px solid #cfd4dc!important;border-radius:6px;padding:3px 7px!important;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.calw:hover .cal{color:var(--blue)!important;border-color:var(--blue)!important}
 .chip.trs{background:#6b7280;border-color:#6b7280;color:#fff}.chip.trs b{color:#fff}
-.entry button.tgl{background:#fff;color:var(--ink);border:1px solid #6b7280}.entry button.tgl.on{background:#6b7280;color:#fff}.entry input:disabled{background:#e5e7eb}
+.entry button.tgl{background:#fff;color:var(--ink);border:1px solid #6b7280}.entry button.tgl.on{background:#6b7280;color:#fff}.ce{width:62px!important;padding:1px 4px!important;font-weight:700;text-align:center;border:1px solid transparent!important;background:transparent!important}.ce:hover,.ce:focus{border-color:#cfd4dc!important;background:#fff!important}.entries .chip{display:inline-flex;align-items:center;gap:2px}
+.entry label.all{display:inline-flex;gap:5px;align-items:center;font-size:14px;cursor:pointer}.entry label.all[hidden]{display:none}.entry label.all input{width:auto}
+.entry button.tgl.hol{border-color:#d97706;color:#b45309}.entry button.tgl.hol.on{background:#d97706;border-color:#d97706;color:#fff}.chip.hol{background:#d97706;border-color:#d97706;color:#fff}.chip.hol b{color:#fff}.entry input:disabled{background:#e5e7eb;font-size:13px!important;font-weight:400!important}
 .entry button,.btn{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--blue);background:var(--blue);color:#fff;padding:5px 14px}
 
 .btn.ghost{background:transparent;color:var(--blue)}
@@ -182,7 +184,7 @@ html.pm .ptitle b{color:var(--blue)}html.pm .ptitle span{color:var(--mute);font-
 <script>
 const ST=['ts','aw','pm'];
 const MN=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-let D,ui={y:null,a:null,r:0,dt:''},edit=false,dirty=false;
+let D,ui={y:null,a:null,r:0,dt:'',dts:{}},edit=false,dirty=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
@@ -269,9 +271,18 @@ const Y=()=>D.years[ui.y];
 const ath=()=>Y().athletes.find(a=>a.id===ui.a);
 
 function days(){const y=+ui.y,m=ui.r,n=new Date(y,m+1,0).getDate(),out=[];for(let d=1;d<=n;d++)out.push({date:`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,m});return out}
+const pad2=n=>String(n).padStart(2,'0');
+function nextDay(d){const t=new Date(d+'T00:00:00');t.setDate(t.getDate()+1);return t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate())}
+function advance(k,dt){const n=nextDay(dt);ui.dts[k]=n.slice(0,7)===dt.slice(0,7)?n:dt}
+function defDateK(k){const p=ui.y+'-'+pad2(ui.r+1);return ui.dts[k]&&ui.dts[k].startsWith(p)?ui.dts[k]:defDate()}
+function okScore(k,x){
+  if(!isFinite(x)||x<0){alert('คะแนนต้องเป็นตัวเลขตั้งแต่ 0 ขึ้นไป');return false}
+  const c=Y().cfg.st[k],mx=c.max;
+  if(mx&&x>mx&&!confirm('คะแนน '+x+' เกินคะแนนเต็มของ '+c.name+' ('+mx+')\nต้องการบันทึกคะแนนนี้หรือไม่?'))return false;
+  return true}
 function defDate(){const p=ui.y+'-'+String(ui.r+1).padStart(2,'0');return ui.dt&&ui.dt.startsWith(p)?ui.dt:today().startsWith(p)?today():p+'-01'}
-function trainDays(sc){const t={};[...sc].sort((a,b)=>(a.t||0)-(b.t||0)).forEach(s=>{if(s.training)t[s.date]=1;else delete t[s.date]});return t}
-function latest(sc){const m={};[...sc].sort((a,b)=>(a.t||0)-(b.t||0)).forEach(s=>{if(s.training)delete m[s.date];else m[s.date]=s.score});return m}
+function trainDays(sc){const t={};[...sc].sort((a,b)=>(a.t||0)-(b.t||0)).forEach(s=>{if(s.training)t[s.date]='T';else if(s.holiday)t[s.date]='H';else delete t[s.date]});return t}
+function latest(sc){const m={};[...sc].sort((a,b)=>(a.t||0)-(b.t||0)).forEach(s=>{if(s.training||s.holiday)delete m[s.date];else m[s.date]=s.score});return m}
 
 function chart(pts,ds,min,max,target,tr){
   const W=720,H=236,L=34,R=8,T=24,B=34,gw=W-L-R,n=ds.length;
@@ -283,7 +294,7 @@ function chart(pts,ds,min,max,target,tr){
 
 
   g+=`<line class="tg" x1="${L}" x2="${W-R}" y1="${Yv(target)}" y2="${Yv(target)}"/><text class="ax" x="${W-R}" y="${Yv(target)-4}" text-anchor="end" style="fill:var(--ink);font-size:11px;font-weight:700">Target ${target}</text>`;
-  const tb=(tr||[]).map(i=>`<rect x="${X(i)-gw/n/2+1}" y="${T}" width="${gw/n-2}" height="${H-B-T}" fill="#6b7280"><title>${fmt(ds[i].date)}: Training</title></rect><text x="${X(i)}" y="${T+(H-B-T)/2}" fill="#fff" font-size="10.5" font-weight="700" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 ${X(i)} ${T+(H-B-T)/2})">Training</text>`).join('');
+  const tb=(tr||[]).map(o=>{const i=o.i,hol=o.t==='H',lb=hol?'Holiday':'Training',cy=T+(H-B-T)/2;return`<rect x="${X(i)-gw/n/2+1}" y="${T}" width="${gw/n-2}" height="${H-B-T}" fill="${hol?'#d97706':'#6b7280'}"><title>${fmt(ds[i].date)}: ${lb}</title></rect><text x="${X(i)}" y="${cy}" fill="#fff" font-size="10.5" font-weight="700" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 ${X(i)} ${cy})">${lb}</text>`}).join('');
   const line=pts.map((p,k)=>(k?'L':'M')+X(p.i)+' '+Yv(p.y)).join(' ');
   const dots=pts.map(p=>`<circle class="pt ${p.y>=target?'ok':''}" cx="${X(p.i)}" cy="${Yv(p.y)}" r="4.5"><title>${fmt(p.date)}: ${p.y}</title></circle><text class="ax" x="${X(p.i)}" y="${Yv(p.y)-8}" text-anchor="middle" style="fill:var(--ink);font-size:11px">${p.y}</text>`).join('');
   return`<div class="chw-scroll"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟคะแนน">${g}${tb}${mid}<path class="ln" d="${line}"/>${dots}</svg></div><div class="mhint noprint">↔ เลื่อนซ้าย-ขวาเพื่อดูกราฟเต็ม</div>`}
@@ -299,17 +310,17 @@ function sumTbl(title,k,a){
 function stCard(k,a,ds){
   const c=Y().cfg.st[k],s=a.st[k],by=latest(s.scores),a0=ds[0].date,a1=ds[ds.length-1].date;
   const pts=ds.map((d,i)=>by[d.date]!=null?{i,y:by[d.date],date:d.date}:null).filter(Boolean);
-  const td=trainDays(s.scores),trIdx=ds.map((d,i)=>td[d.date]&&by[d.date]==null?i:-1).filter(i=>i>=0);
+  const td=trainDays(s.scores),trIdx=ds.map((d,i)=>td[d.date]&&by[d.date]==null?{i,t:td[d.date]}:null).filter(Boolean);
   const ys=pts.map(p=>p.y),last=ys[ys.length-1];
   const stats=ys.length?`<span class="chip ${last>=c.target?'ok':'bad'}">ล่าสุด <b>${last}</b></span><span class="chip">สูงสุด <b>${Math.max(...ys)}</b></span><span class="chip">เฉลี่ย <b>${(ys.reduce((x,y)=>x+y,0)/ys.length).toFixed(1)}</b></span><span class="chip">ถึงเป้า <b>${ys.filter(v=>v>=c.target).length}/${ys.length}</b> วัน</span>`:'<span class="hint">ยังไม่มีคะแนนในรอบนี้</span>';
   const mine=s.scores.filter(x=>x.date>=a0&&x.date<=a1).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:(y.t||0)-(x.t||0));
-  const ents=edit?`<div class="entries noprint">${mine.map(x=>`<span class="chip ${x.training?'trs':''}">${x.date.slice(8)}/${x.date.slice(5,7)} · ${x.training?'<b>Training</b>':`<b>${x.score}</b>`}${edit?` <button class="x" data-a="delsc" data-k="${k}" data-id="${x.id}" title="ลบ">✕</button>`:''}</span>`).join('')}</div>`:'';
-  const form=edit?`<div class="entry noprint"><b>ลงคะแนน</b>${dateIn(`id="dt-${k}"`,defDate())}<input type="number" step="any" inputmode="decimal" id="sc-${k}" placeholder="คะแนน"><button type="button" class="tgl" data-a="trtoggle" data-k="${k}" id="tr-${k}" aria-pressed="false" title="ช่วงฝึกซ้อม ยังไม่เก็บคะแนน">Training</button><button data-a="addsc" data-k="${k}">บันทึก</button></div>`:'';
+  const ents=edit?`<div class="entries noprint">${mine.map(x=>`<span class="chip ${x.training?'trs':x.holiday?'hol':''}">${x.date.slice(8)}/${x.date.slice(5,7)} · ${x.training?'<b>Training</b>':x.holiday?'<b>Holiday</b>':`<input class="ce" type="number" step="any" inputmode="decimal" data-ce="${k}.${x.id}" value="${x.score}" aria-label="แก้คะแนน">`}${edit?` <button class="x" data-a="delsc" data-k="${k}" data-id="${x.id}" title="ลบ">✕</button>`:''}</span>`).join('')}</div>`:'';
+  const form=edit?`<div class="entry noprint"><b>ลงคะแนน</b>${dateIn(`id="dt-${k}"`,defDateK(k))}<input type="number" step="any" inputmode="decimal" id="sc-${k}" placeholder="คะแนน"><button type="button" class="tgl" data-a="trtoggle" data-k="${k}" id="tr-${k}" aria-pressed="false" title="ช่วงฝึกซ้อม ยังไม่เก็บคะแนน">Training</button><button type="button" class="tgl hol" data-a="trtoggle" data-k="${k}" id="hl-${k}" aria-pressed="false" title="วันหยุด ไม่มีการฝึกซ้อม">Holiday</button><label class="all" id="al-${k}" hidden><input type="checkbox" id="all-${k}" checked> ใช้กับทั้ง 3 สถานี</label><button data-a="addsc" data-k="${k}">บันทึก</button></div>`:'';
   const iss=s.issues.filter(x=>x.date>=a0&&x.date<=a1).sort((x,y)=>x.date<y.date?-1:1);
   const ir=iss.map(x=>`<tr><td data-lbl="DATE">${edit?`${dateIn(`data-i="${k}.${x.id}.date"`,x.date)}`:fmt(x.date)}</td><td data-lbl="PROBLEM (จุดที่ถูกตัดคะแนน)">${edit?`<textarea data-i="${k}.${x.id}.problem">${esc(x.problem)}</textarea>`:esc(x.problem)}</td><td data-lbl="COUNTERMEASURE (วิธีแก้ไข)">${edit?`<textarea data-i="${k}.${x.id}.counter">${esc(x.counter)}</textarea>`:esc(x.counter)}</td><td data-lbl="PIC">${edit?`<input data-i="${k}.${x.id}.pic" value="${esc(x.pic)}">`:esc(x.pic)}</td>${edit?`<td class="d noprint"><button class="x" data-a="deliss" data-k="${k}" data-id="${x.id}" aria-label="ลบรายการ">✕</button></td>`:''}</tr>`).join('');
   return`<section class="card st"><div class="sthead"><h3>${edit?`<input data-cfg="${k}.name" value="${esc(c.name)}" class="nm">`:esc(c.name)}</h3>
   <div class="meta"><label>MUS 2025 ${edit?`<input data-s="${k}.mus" placeholder="เช่น 38 คะแนน" value="${esc(s.mus)}">`:`<b>${esc(s.mus)||'ยังไม่ระบุ'}</b>`}</label><label>Winner Cross Plant ${edit?`<input data-s="${k}.winner" placeholder="เช่น ชื่อ / คะแนน" value="${esc(s.winner)}">`:`<b>${esc(s.winner)||'ยังไม่ระบุ'}</b>`}</label><label>Target ${edit?`<input type="number" data-cfg="${k}.target" data-r="1" value="${c.target}">`:`<b>${c.target}</b>`}</label>${edit?`<label>กราฟต่ำสุด<input type="number" data-cfg="${k}.min" data-r="1" value="${c.min}"></label><label>เต็ม<input type="number" data-cfg="${k}.max" data-r="1" value="${c.max}"></label>`:''}</div></div>
-  <div class="stats">${stats}${trIdx.length?`<span class="chip trs">Training <b>${trIdx.length}</b> วัน</span>`:''}</div><div class="stb"><div class="chw">${chart(pts,ds,c.min,c.max,c.target,trIdx)}${form}${ents}</div><div class="isw">
+  <div class="stats">${stats}${trIdx.some(o=>o.t==='T')?`<span class="chip trs">Training <b>${trIdx.filter(o=>o.t==='T').length}</b> วัน</span>`:''}${trIdx.some(o=>o.t==='H')?`<span class="chip hol">Holiday <b>${trIdx.filter(o=>o.t==='H').length}</b> วัน</span>`:''}</div><div class="stb"><div class="chw">${chart(pts,ds,c.min,c.max,c.target,trIdx)}${form}${ents}</div><div class="isw">
   <table class="iss"><tr><th>DATE</th><th>PROBLEM (จุดที่ถูกตัดคะแนน)</th><th>COUNTERMEASURE (วิธีแก้ไข)</th><th>PIC</th>${edit?'<th class="noprint"></th>':''}</tr>${ir||`<tr><td colspan="${edit?5:4}" class="empty">ยังไม่มีรายการ</td></tr>`}</table>
   ${edit?`<p class="noprint"><button class="btn ghost" data-a="addiss" data-k="${k}">+ เพิ่มจุดที่ถูกตัดคะแนน</button></p>`:''}</div></div></section>`}
 
@@ -343,8 +354,8 @@ function render(){
 document.addEventListener('change',e=>{
   const t=e.target,d=t.dataset,a=ath();
   if(t.classList.contains('dpk')){const tx=t.closest('.dw')?.querySelector('.dtx');if(t.value&&tx){tx.value=fmt(t.value);tx.dispatchEvent(new Event('change',{bubbles:true}))}return}
-  if(t.id==='ysel'){if(t.value==='__new'){openYr();return}ui.y=t.value;ui.a=null;return render()}
-  if(t.id==='asel'){if(t.value==='__new'){openNew();return}ui.a=t.value;return render()}
+  if(t.id==='ysel'){if(t.value==='__new'){openYr();return}ui.y=t.value;ui.a=null;ui.dts={};return render()}
+  if(t.id==='asel'){if(t.value==='__new'){openNew();return}ui.a=t.value;ui.dts={};return render()}
   if(t.id==='rsel'){ui.r=+t.value;return render()}
   if(t.id==='ttlin'){D.title=t.value;save();return render()}
   if(t.id==='imp')return doImport(t.files[0]);
@@ -352,8 +363,13 @@ document.addEventListener('change',e=>{
   if(t.id&&t.id.startsWith('dt-')){const iso=parseD(t.value);
     if(!iso){alert('รูปแบบวันที่ไม่ถูกต้อง ใช้ วว/ดด/ปปปป เช่น 02/11/2026');t.value=fmt(defDate());return}
     if(iso.slice(0,4)!==ui.y){alert('ปีของวันที่ไม่ตรงกับปี '+ui.y+' ที่เลือกอยู่');t.value=fmt(defDate());return}
-    ui.dt=iso;t.value=fmt(iso);return}
+    ui.dt=iso;ui.dts[t.id.slice(3)]=iso;t.value=fmt(iso);return}
   if(!edit||!a)return;
+  if(d.ce){const[k,id]=d.ce.split('.'),x=a.st[k].scores.find(z=>z.id===id),v=t.value;
+    if(!x)return render();
+    if(v===''){alert('กรุณาใส่คะแนน (ถ้าต้องการลบ ให้กด ✕)');return render()}
+    if(!okScore(k,+v))return render();
+    x.score=+v;x.t=Date.now();save();return render()}
   if(d.f)a[d.f]=t.value;
   else if(d.sum){const[k,i,f]=d.sum.split('.');a.sum[k][i][f]=f==='l'?t.value:num(t.value)}
   else if(d.s){const[k,f]=d.s.split('.');a.st[k][f]=t.value}
@@ -409,7 +425,7 @@ document.addEventListener('click',e=>{
     case'newcancel':$('#newdlg').close();break;
     case'photo':$('#photoin').value='';$('#photoin').click();break;
     case'addsc':addScore(k);break;
-    case'trtoggle':{b.classList.toggle('on');const on=b.classList.contains('on'),inp=$('#sc-'+k);inp.disabled=on;if(on)inp.value='';inp.placeholder=on?'ไม่มีคะแนน':'คะแนน';b.setAttribute('aria-pressed',on)}break;
+    case'trtoggle':{const on=!b.classList.contains('on');b.parentNode.querySelectorAll('.tgl').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')});if(on){b.classList.add('on');b.setAttribute('aria-pressed','true')}const inp=$('#sc-'+k);inp.disabled=on;if(on)inp.value='';inp.placeholder=on?'ไม่มีคะแนน':'คะแนน';$('#al-'+k).hidden=!(on&&b.id==='hl-'+k)}break;
     case'delsc':a.st[k].scores=a.st[k].scores.filter(x=>x.id!==id);save();render();break;
     case'addiss':a.st[k].issues.push({id:uid(),date:defDate(),problem:'',counter:'',pic:''});save();render();break;
     case'deliss':a.st[k].issues=a.st[k].issues.filter(x=>x.id!==id);save();render();break;
@@ -430,14 +446,18 @@ function addNew(){
   const v=$('#cpsrc').value,n=newAth();
   if(v){const[y,id]=v.split('|'),s=D.years[y].athletes.find(x=>x.id===id);
     if(s){['code','name','position','section','depart','age','exp','shop'].forEach(f=>n[f]=s[f]);n.sum=JSON.parse(JSON.stringify(s.sum));ST.forEach(k=>{n.st[k].mus=s.st[k].mus;n.st[k].winner=s.st[k].winner})}}
-  Y().athletes.push(n);ui.a=n.id;save();$('#newdlg').close();render();
+  Y().athletes.push(n);ui.a=n.id;ui.dts={};save();$('#newdlg').close();render();
   const f=document.querySelector('[data-f=name]');if(f){f.focus();f.select()}
 }
 function addScore(k){
-  const dt=parseD($('#dt-'+k).value),v=$('#sc-'+k).value,tr=$('#tr-'+k).classList.contains('on');
-  if(!dt||(!tr&&v===''))return alert('กรุณาใส่วันที่ (วว/ดด/ปปปป) และคะแนน หรือกด Training');
+  const dt=parseD($('#dt-'+k).value),v=$('#sc-'+k).value,md=$('#tr-'+k).classList.contains('on')?'T':$('#hl-'+k).classList.contains('on')?'H':'';
+  if(!dt||(!md&&v===''))return alert('กรุณาใส่วันที่ (วว/ดด/ปปปป) และคะแนน หรือกด Training / Holiday');
   if(dt.slice(0,4)!==ui.y)return alert('ปีของวันที่ไม่ตรงกับปี '+ui.y+' ที่เลือกอยู่');
-  ui.dt=dt;ui.r=+dt.slice(5,7)-1;ath().st[k].scores.push(tr?{id:uid(),date:dt,score:null,training:true,t:Date.now()}:{id:uid(),date:dt,score:+v,t:Date.now()});save();render();
+  if(!md&&!okScore(k,+v))return;
+  const all=md==='H'&&$('#all-'+k).checked,mk=()=>md==='T'?{id:uid(),date:dt,score:null,training:true,t:Date.now()}:md==='H'?{id:uid(),date:dt,score:null,holiday:true,t:Date.now()}:{id:uid(),date:dt,score:+v,t:Date.now()};
+  ui.dt=dt;ui.r=+dt.slice(5,7)-1;
+  (all?ST:[k]).forEach(q=>{ath().st[q].scores.push(mk());advance(q,dt)});
+  save();render();
   const n=$('#sc-'+k);if(n)n.focus();
 }
 function doExport(){
@@ -464,7 +484,7 @@ function doPhoto(f){
 }
 const PW=1527,PH=1062;let _pe=false;
 window.addEventListener('beforeprint',()=>{
-  _pe=edit;if(edit){edit=false;render()}
+  _pe=_pe||edit;if(edit){edit=false;render()}
   document.documentElement.classList.add('pm');
   const m=$('main');m.style.transformOrigin='0 0';
   const f=z=>{m.style.width=(PW/z)+'px';m.style.transform='scale('+z+')';return m.offsetHeight*z};
