@@ -1,6 +1,6 @@
 {
  "pw": "1234",
- "updated": 1795776880928,
+ "updated": 1795776888616,
  "years": {
   "2026": {
    "cfg": {
@@ -969,7 +969,7 @@
         {
          "id": "mwyv6pqpvl1",
          "date": "2026-11-27",
-         "problem": "",
+         "problem": "แก้ไขวงจร Relay ช้า",
          "counter": "",
          "pic": ""
         }
